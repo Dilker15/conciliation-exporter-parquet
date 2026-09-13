@@ -7,6 +7,7 @@ RUN pip install \
     -r requirements.txt \
     --target "${LAMBDA_TASK_ROOT}"
 
-COPY src/ ${LAMBDA_TASK_ROOT}/src/
+COPY src/ ${LAMBDA_TASK_ROOT}/
+COPY shared_layer/ ${LAMBDA_TASK_ROOT}/shared_layer/
 
 CMD ["lambda_function.lambda_handler"]
