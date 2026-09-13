@@ -6,7 +6,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  LAMBDA_FUNCTION_NAME: exporter_data_parquet
+  LAMBDA_FUNCTION_NAME: conciliation-exporter-parquet
   ECR_REPOSITORY: conciliation-exporter-parquet
 
 
