@@ -7,6 +7,8 @@ on:
 env:
   AWS_REGION: us-east-1
   LAMBDA_FUNCTION_NAME: exporter_data_parquet
+  ECR_REPOSITORY: conciliation-exporter-parquet
+
 
 jobs:
   deployment:
@@ -23,29 +25,65 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Build App
+      - name: Login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+
+      - name: Build Docker image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          mkdir -p build
+          docker build \
+            -t $ECR_REPOSITORY:$IMAGE_TAG \
+            .
 
-          pip3 install \
-            -r requirements.txt \
-            -t build
 
-          cp -R src/* build/
+      - name: Tag image
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
 
-      - name: Compress App
         run: |
-          cd build
-          zip -rq ../lambda.zip .
+          docker tag \
+            $ECR_REPOSITORY:$IMAGE_TAG \
+            $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Upload zip Lambda to AWS
+
+          docker tag \
+            $ECR_REPOSITORY:$IMAGE_TAG \
+            $REGISTRY/$ECR_REPOSITORY:latest
+
+
+      - name: Push image to ECR
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+
         run: |
+          docker push \
+            $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+
+          docker push \
+            $REGISTRY/$ECR_REPOSITORY:latest
+
+
+      - name: Update Lambda image
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+
+        run: |
+
           aws lambda update-function-code \
-            --function-name "$LAMBDA_FUNCTION_NAME" \
-            --zip-file fileb://lambda.zip
+            --function-name $LAMBDA_FUNCTION_NAME \
+            --image-uri $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: App Deployed Successfull
-        run : echo "Lambda Zip Code was Uploaded"
+
+      - name: Deployment Success
+        run : echo "Deployment Image to ECR and Update IMAGE-URL in function success"
+        
 
 
 
