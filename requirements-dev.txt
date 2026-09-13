@@ -1,0 +1,2 @@
+boto3==1.43.61
+boto3-stubs[s3,dynamo]==1.43.61

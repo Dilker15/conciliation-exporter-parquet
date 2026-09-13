@@ -1,0 +1,61 @@
+name: Deployment-Production Parquet Lambda
+
+on:
+  push:
+    branches: ["main"]
+
+env:
+  AWS_REGION: us-east-1
+  LAMBDA_FUNCTION_NAME: exporter_data_parquet
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Build App
+        run: |
+          mkdir -p build
+
+          pip3 install \
+            -r requirements.txt \
+            -t build
+
+          cp -R src/* build/
+
+      - name: Compress App
+        run: |
+          cd build
+          zip -rq ../lambda.zip .
+
+      - name: Upload zip Lambda to AWS
+        run: |
+          aws lambda update-function-code \
+            --function-name "$LAMBDA_FUNCTION_NAME" \
+            --zip-file fileb://lambda.zip
+
+      - name: App Deployed Successfull
+        run : echo "Lambda Zip Code was Uploaded"
+
+
+
+
+
+          
+
+
+
+        
+
+
+        
