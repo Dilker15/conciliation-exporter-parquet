@@ -2,12 +2,12 @@ from services.exporter import ExporterService
 from services.parquet_write_service import ParquetWriterService
 from services.s3_service import S3Service
 from services.settlement_service import SettlementService
-from shared_layer.repositories.settlement_repository import SettlementRepostory
+from shared_layer.repositories.settlement_repository import SettlementRepository
 
 exporter_service = ExporterService(
                     parquet_service=ParquetWriterService(),
                     s3_service=S3Service(),
-                    settlementService=SettlementService(repository=SettlementRepostory())
+                    settlementService=SettlementService(repository=SettlementRepository())
                                    )
 
 
