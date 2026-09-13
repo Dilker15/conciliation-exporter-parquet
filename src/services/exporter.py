@@ -22,9 +22,9 @@ class ExporterService:
             parquet_path = f"/tmp/{file_id}.parquet"
 
             self._parquet_service.start(parquet_path)
-
+            print("PAGINAGE STARTED")
             while True:
-
+                print("LOOP STARTED")
                 items, next_key = (self._settlement_service.get_settlements_paginated(
                                                                                     file_id=file_id,
                                                                                     limit=5000,
@@ -37,7 +37,7 @@ class ExporterService:
                     break
 
             self._parquet_service.close()
-
+            print("PYARROW CLOSE")
             self._s3_service.upload(bucket_name=BUCKET_NAME,route=parquet_path,name=f"{file_id}.parquet")
 
             return file_id
