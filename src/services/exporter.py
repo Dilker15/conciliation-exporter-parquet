@@ -28,7 +28,7 @@ class ExporterService:
                 items, next_key = (self._settlement_service.get_settlements_paginated(
                                                                                     file_id=file_id,
                                                                                     limit=5000,
-                                                                                    last_evaluated_key=next_key)
+                                                                                    page=next_key)
                                     )
                 if items:
                     self._parquet_service.write_batch(items)
