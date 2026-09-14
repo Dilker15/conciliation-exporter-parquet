@@ -1,11 +1,11 @@
-from shared_layer.repositories.settlement_repository import SettlementRespository
+from shared_layer.repositories.settlement_repository import SettlementRepository
 
 
 
 class SettlementService:
 
 
-    def __init__(self,repository:SettlementRespository)->None:
+    def __init__(self,repository:SettlementRepository)->None:
         self._repository = repository
 
 
