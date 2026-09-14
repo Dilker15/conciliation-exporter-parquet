@@ -18,23 +18,40 @@ class ExporterService:
 
     def export(self, file_id: str) -> str:
         try:
-            next_key = None
+            last_evaluated_key = None
+
             parquet_path = f"/tmp/{file_id}.parquet"
 
             self._parquet_service.start(parquet_path)
-            print("PAGINAGE STARTED")
+
+            print("PAGINATION STARTED")
+
             while True:
                 print("LOOP STARTED")
-                items, last_evaluated_key = (self._settlement_service.get_settlements_paginated(file_id=file_id,limit=5000,last_evaluated_key=last_evaluated_key))
+
+                items, last_evaluated_key = (
+                    self._settlement_service.get_settlements_paginated(
+                        file_id=file_id,
+                        limit=5000,
+                        last_evaluated_key=last_evaluated_key
+                    )
+                )
+
                 if items:
                     self._parquet_service.write_batch(items)
 
-                if not next_key:
+                if not last_evaluated_key:
                     break
 
             self._parquet_service.close()
+
             print("PYARROW CLOSE")
-            self._s3_service.upload(bucket_name=BUCKET_NAME,route=parquet_path,name=f"{file_id}.parquet")
+
+            self._s3_service.upload(
+                bucket_name=BUCKET_NAME,
+                route=parquet_path,
+                name=f"{file_id}.parquet"
+            )
 
             return file_id
 
