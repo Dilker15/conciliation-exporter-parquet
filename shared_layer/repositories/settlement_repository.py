@@ -51,15 +51,20 @@ class SettlementRepository:
         )
 
 
-    def get_settlements_paginated(self,file_id: str,limit: int = 5000,last_evaluated_key: dict[str,Any] | None = None) -> tuple[list[dict], dict | None]:
-
-        params = {"KeyConditionExpression": ("PK = :pk AND begins_with(SK, :sk)"),
-                  "ExpressionAttributeValues": {
-                  ":pk": f"FILE#{file_id}",
-                  ":sk": "SETTLEMENT#",
+    def get_settlements_paginated(self,file_id: str,limit: int = 5000,last_evaluated_key: dict[str, Any] | None = None) -> tuple[list[dict], dict | None]:
+        params = {
+            "TableName": self._table_name,
+            "KeyConditionExpression": "PK = :pk AND begins_with(SK, :sk)",
+            "ExpressionAttributeValues": {
+                ":pk": {
+                    "S": f"FILE#{file_id}"
                 },
-                "Limit": limit,
-            }
+                ":sk": {
+                    "S": "SETTLEMENT#"
+                }
+            },
+            "Limit": limit
+        }
 
         if last_evaluated_key:
             params["ExclusiveStartKey"] = last_evaluated_key
@@ -68,4 +73,5 @@ class SettlementRepository:
 
         return (
             response.get("Items", []),
-            response.get("LastEvaluatedKey"))
+            response.get("LastEvaluatedKey")
+        )
