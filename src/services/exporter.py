@@ -25,11 +25,7 @@ class ExporterService:
             print("PAGINAGE STARTED")
             while True:
                 print("LOOP STARTED")
-                items, next_key = (self._settlement_service.get_settlements_paginated(
-                                                                                    file_id=file_id,
-                                                                                    limit=5000,
-                                                                                    page=next_key)
-                                    )
+                items, last_evaluated_key = (self._settlement_service.get_settlements_paginated(file_id=file_id,limit=5000,last_evaluated_key=last_evaluated_key))
                 if items:
                     self._parquet_service.write_batch(items)
 
