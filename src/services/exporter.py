@@ -67,7 +67,7 @@ class ExporterService:
             raise
 
 
-    def map_to_parquet(item: dict) -> dict:
+    def map_to_parquet(self,item: dict) -> dict:
         return {
             "settlement_id": item["SK"].replace("SETTLEMENT#", ""),
             "transaction_id": item["transaction_id"],
