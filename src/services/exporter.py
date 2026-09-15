@@ -24,10 +24,7 @@ class ExporterService:
 
             self._parquet_service.start(parquet_path)
 
-            print("PAGINATION STARTED")
-
             while True:
-                print("LOOP STARTED")
 
                 items, last_evaluated_key = (
                     self._settlement_service.get_settlements_paginated(
@@ -36,9 +33,6 @@ class ExporterService:
                         last_evaluated_key=last_evaluated_key
                     )
                 )
-                print("---------- ITEMS QUERY --------------")
-                print(items)
-                print("---------- ITEMS QUERY --------------")
                 if items:
                     parquet_items = [
                         self.map_to_parquet(item)
@@ -51,8 +45,6 @@ class ExporterService:
                     break
 
             self._parquet_service.close()
-
-            print("PYARROW CLOSE")
 
             self._s3_service.upload(
                 bucket_name=BUCKET_NAME,

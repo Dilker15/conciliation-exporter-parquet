@@ -13,7 +13,7 @@ class S3Service:
     def upload(self,bucket_name:str,route:str,name:str):
 
         self._client.upload_file(Bucket=bucket_name,
-                                 Key=name,
+                                 Key=f"settlements/{name}",
                                  Filename=route
                                 )
 
