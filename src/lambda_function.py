@@ -14,6 +14,8 @@ exporter_service = ExporterService(
 def lambda_handler(event, context):
 
     file_id = event["detail"]["file_id"]
+    key_file = event["detail"]["key_file"]
+    print("KEY FILE RECEIVE : ",key_file)
     result = exporter_service.export(file_id)
     return {
         "statusCode": 200,
