@@ -36,9 +36,16 @@ class ExporterService:
                         last_evaluated_key=last_evaluated_key
                     )
                 )
-
+                print("---------- ITEMS QUERY --------------")
+                print(items)
+                print("---------- ITEMS QUERY --------------")
                 if items:
-                    self._parquet_service.write_batch(items)
+                    parquet_items = [
+                        self.map_to_parquet(item)
+                        for item in items
+                    ]
+
+                    self._parquet_service.write_batch(parquet_items)
 
                 if not last_evaluated_key:
                     break
@@ -59,4 +66,16 @@ class ExporterService:
             print(f"Error on Export: {error}")
             raise
 
+
+    def map_to_parquet(item: dict) -> dict:
+        return {
+            "settlement_id": item["SK"].replace("SETTLEMENT#", ""),
+            "transaction_id": item["transaction_id"],
+            "file_id": item["PK"].replace("FILE#", ""),
+            "amount": float(item["settled_amount"]),
+            "currency": item["currency"],
+            "provider": item["provider_name"],
+            "status": item["settlement_status"],
+            "created_at": item["settlement_date"],
+        }
 

@@ -1,5 +1,6 @@
 import boto3
 from shared_layer.models.settlement import Settlement
+from boto3.dynamodb.types import TypeDeserializer
 import os
 from typing import Any
 
@@ -8,6 +9,7 @@ class SettlementRepository:
     def __init__(self):
         self._client = boto3.client("dynamodb")
         self._table_name = os.environ["CONCILIATION_TABLE_NAME"]
+        self._deserializer = TypeDeserializer()
 
     def create_settlement_batch(self, settlements: list[Settlement]):
         requests = []
@@ -71,7 +73,15 @@ class SettlementRepository:
 
         response = self._client.query(**params)
 
+        items = [
+            {
+                key: self._deserializer.deserialize(value)
+                for key, value in item.items()
+            }
+            for item in response.get("Items", [])
+        ]
+
         return (
-            response.get("Items", []),
+            items,
             response.get("LastEvaluatedKey")
         )
