@@ -20,9 +20,11 @@ def lambda_handler(event, context):
     result = exporter_service.export(file_id)
 
     return {
-        "result": result,
-        "settlement_date": settlement_date.isoformat()
+       "file_id": file_id,
+       "settlement_date": settlement_date.isoformat()
     }
+
+
 
 def parse_date(key:str)->datetime:
     parts = key.split("/")
