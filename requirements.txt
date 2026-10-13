@@ -1,2 +1,3 @@
 boto3==1.43.61
 pyarrow==21.0.0
+aws-lambda-powertools
